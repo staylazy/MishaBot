@@ -1,6 +1,7 @@
 import vk
 import time
 import os
+import webbrowser
 
 user_id = int(input('ID страницы: '))
 pabl_id = int(input('ID группы: ')) * -1
@@ -14,6 +15,7 @@ album = input('ID альбома: ')
 if album.isdigit():
     album = int(album)
 offset_pic = int(input('Offset картинка: ')) - 1
+
 value = int(input('Количество: '))
 while(value % 6 != 0):
     value = int(input('Количество: '))
@@ -64,10 +66,10 @@ for i in range(value // 6):
     elif month == 1 and day == 31:
         new_month(month, list_date)
     elif (month == 2 and day == 28 and
-    (year % 4 != 0 or (year % 100 == 0 and year % 400 != 0))):
+        (year % 4 != 0 or (year % 100 == 0 and year % 400 != 0))):
         new_month(month, list_date)
     elif (month == 2 and day == 29 and not
-    (year % 4 != 0 or (year % 100 == 0 and year % 400 != 0))):
+        (year % 4 != 0 or (year % 100 == 0 and year % 400 != 0))):
         new_month(month, list_date)
     else:
         day += 1
@@ -85,8 +87,16 @@ for i in range(value // 6):
         picture_id = item.get('id')
         picture = 'photo' + str(user_id) + '_'
         picture += str(picture_id)
-        api.wall.post(owner_id=pabl_id, attachments=picture, from_group=1,
-                      message=str(mes) + '/10850', publish_date=date, v=5.77)
+        try:
+            api.wall.post(owner_id=pabl_id, attachments=picture, from_group=1,
+                        message=str(mes) + '/10850', publish_date=date, v=5.77)
+        except Exception as exc:
+            if exc.code == 14:
+                webbrowser.open(exc.captcha_img)
+                sid = exc.captcha_sid
+                captcha = input("Требуется ввод капчи: ")
+                api.wall.post(owner_id=pabl_id, attachments=picture, from_group=1,
+                        message=str(mes) + '/10850', publish_date=date, captcha_sid=sid, captcha_key=captcha, v=5.77)
         date += frequency
         mes = int(mes) + 1
         mes = str(mes)
