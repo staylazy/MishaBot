@@ -37,7 +37,7 @@ def new_month(month, list_date):
 
 for i in range(value // 6):
     data = api.photos.get(owner_id=user_id, album_id=album,
-                          rev=0, offset=offset_pic, count=6, v=5.77)
+                          rev=0, offset=offset_pic, count=6, v=5.131)
     offset_pic += 6
     list_date = list(str_date)
     list_date[8] = '0'
@@ -89,14 +89,14 @@ for i in range(value // 6):
         picture += str(picture_id)
         try:
             api.wall.post(owner_id=pabl_id, attachments=picture, from_group=1,
-                        message=str(mes) + '/10850', publish_date=date, v=5.77)
+                        message=str(mes) + '/10850', publish_date=date, v=5.131)
         except Exception as exc:
             if exc.code == 14:
                 webbrowser.open(exc.captcha_img)
                 sid = exc.captcha_sid
                 captcha = input("Требуется ввод капчи: ")
                 api.wall.post(owner_id=pabl_id, attachments=picture, from_group=1,
-                        message=str(mes) + '/10850', publish_date=date, captcha_sid=sid, captcha_key=captcha, v=5.77)
+                        message=str(mes) + '/10850', publish_date=date, captcha_sid=sid, captcha_key=captcha, v=5.131)
         date += frequency
         mes = int(mes) + 1
         mes = str(mes)
