@@ -3,26 +3,39 @@ import time
 import os
 import webbrowser
 
-user_id = int(input('ID страницы: '))
-pabl_id = int(input('ID группы: ')) * -1
-token = input('token: ')
+from datetime import datetime
+
+
+try:
+    info_file = open('info.txt', 'r')
+except FileNotFoundError:
+    print("Info file not found")
+    time.sleep(100)
+
+info = []
+
+for line in info_file:
+    info.append(line)
+
+user_id = int(info[0])
+pabl_id = int(info[1]) * -1
+token = info[2]
+album = info[3]
+offset_pic = int(info[4]) - 1
+value = int(info[5])
 
 session = vk.Session(access_token=token)
-
+print(session)
 api = vk.API(session)
-
-album = input('ID альбома: ')
-if album.isdigit():
-    album = int(album)
-offset_pic = int(input('Offset картинка: ')) - 1
-
-value = int(input('Количество: '))
-while(value % 6 != 0):
-    value = int(input('Количество: '))
 
 mes = offset_pic + 1
 mes = str(mes)
-frequency = 10800
+# 8, 10, 11, 13, 15, 18, 20, 21, 22, 23
+# 2 1 3 
+one_hour = 3600
+two_hours = 3600 * 2
+three_hours = 3600 * 3
+
 date = int(time.time()) + 30
 str_date = time.strftime('%d%m%Y%H%M%S', time.localtime(date))
 
@@ -35,10 +48,10 @@ def new_month(month, list_date):
     list_date[1] = '1'
 
 
-for i in range(value // 6):
+for i in range(value // 10):
     data = api.photos.get(owner_id=user_id, album_id=album,
-                          rev=0, offset=offset_pic, count=6, v=5.131)
-    offset_pic += 6
+                          rev=0, offset=offset_pic, count=10, v=5.131)
+    offset_pic += 10
     list_date = list(str_date)
     list_date[8] = '0'
     list_date[9] = '8'
@@ -97,7 +110,20 @@ for i in range(value // 6):
                 captcha = input("Требуется ввод капчи: ")
                 api.wall.post(owner_id=pabl_id, attachments=picture, from_group=1,
                         message=str(mes) + '/10850', publish_date=date, captcha_sid=sid, captcha_key=captcha, v=5.131)
-        date += frequency
+        # 8, 10, 11, 13, 15, 18, 20, 21, 22, 23
+        # date += frequency
+        unix_date_hour = int(datetime.fromtimestamp(date).hour)
+        # 8-10 11-13 13-15 18-20 ----- 2
+        # 10-11 20-21 21-22 22-23 ----- 1
+        # 15-18 ----- 3
+        if unix_date_hour == 8 or unix_date_hour == 11 or \
+           unix_date_hour == 13 or unix_date_hour == 18:
+            date += two_hours
+        elif unix_date_hour == 10 or unix_date_hour == 20 or \
+             unix_date_hour == 21 or unix_date_hour == 22:
+            date += one_hour
+        elif unix_date_hour == 15:
+            date += three_hours
         mes = int(mes) + 1
         mes = str(mes)
 os.system("pause")
