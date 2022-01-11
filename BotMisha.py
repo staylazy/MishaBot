@@ -19,8 +19,8 @@ for line in info_file:
 
 user_id = int(info[0])
 pabl_id = int(info[1]) * -1
-token = info[2]
-album = info[3]
+token = info[2].replace('\n', '')
+album = info[3].replace('\n', '')
 offset_pic = int(info[4]) - 1
 value = int(info[5])
 
