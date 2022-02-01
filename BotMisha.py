@@ -2,6 +2,7 @@ import vk
 import time
 import os
 import webbrowser
+import time
 
 from datetime import datetime
 
@@ -49,6 +50,7 @@ def new_month(month, list_date):
 
 
 for i in range(value // 10):
+    time.sleep(3)
     data = api.photos.get(owner_id=user_id, album_id=album,
                           rev=0, offset=offset_pic, count=10, v=5.131)
     offset_pic += 10
