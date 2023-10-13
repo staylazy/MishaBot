@@ -27,6 +27,7 @@ class Bot:
 
     def __data(self, user_id, offset, album):
         time.sleep(2)
+        offset -= offset // 10000 * 10000
         return self.__api.photos.get(owner_id=user_id, album_id=album,
                           rev=0, offset=offset, count=PICS_PER_DAY, v=5.131) 
 
@@ -65,6 +66,7 @@ class Bot:
         date = PostDate(day=day, month=month, year=year)
         for _ in range(user._count // PICS_PER_DAY):
             post_timestamps = date.get_post_timestamps()
+
             data = self.__data(user._id, user._offset, user._album)['items']
             for i in range(PICS_PER_DAY):
                 picture = data[i]
