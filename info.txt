@@ -1,9 +1,11 @@
-user_id
-public_id
-token 
-album
-offset
-count
-day 
-month
-year
+[DEFAULT]
+user_id = 1
+public_id = 1
+token = 1
+album = 1
+offset = 14
+count = 1
+day = 1
+month = 2
+year = 3
+

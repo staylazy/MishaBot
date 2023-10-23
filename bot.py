@@ -3,6 +3,9 @@ import os
 import time
 import vk
 import webbrowser
+import sys
+import configparser
+import getopt
 from post_date import PostDate
 
 PICS_PER_DAY = 10
@@ -21,7 +24,7 @@ class ApiUser:
 
 class Bot:
     def __init__(self, token: str):
-        self.__api = vk.API(vk.Session(access_token=token))
+        self.__api = vk.API(access_token=token)
         open('log.txt', 'w').close()
         print(self.__api)
 
@@ -80,17 +83,30 @@ class Bot:
             print()
 
 
-def main(): 
-    info = []   
-    with open('info.txt', 'r') as file:
-        for line in file:
-            info.append(line)
-    info.append(line)
-    token = info[2].replace('\n', '')
-    user = ApiUser(user_id=info[0], public_id=info[1], album=info[3], offset=info[4], count=info[5])
-    bot = Bot(token)
-    bot.post(user, day=int(info[6]), month=int(info[7]), year=int(info[8]))
+def cmd_arg(argv): 
+    opts, args = getopt.getopt(argv,"hi:",["ifile="])
+    for opt, arg in opts:
+        if opt == '-h':
+            print ('-i <inputfile>')
+            sys.exit()
+        elif opt in ("-i", "--ifile"):
+            inputfile = arg
+
+    print ('Input file is ', inputfile)
+    return inputfile 
+
+def main(argv): 
+    inputfile = cmd_arg(argv)
+    config = configparser.ConfigParser()
+    config.read(inputfile)
+    info = config['DEFAULT']
+    user = ApiUser(user_id=info['user_id'], public_id=info['public_id'], album=info['album'], offset=info['offset'], count=info['count'])
+    bot = Bot(info['token'])
+    bot.post(user, day=int(info['day']), month=int(info['month']), year=int(info['year']))
+    config['DEFAULT']['offset'] = str(int(config['DEFAULT']['offset']) + int(config['DEFAULT']['count']))
+    with open(inputfile, 'w') as f:
+        config.write(f)
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
     os.system("pause")
